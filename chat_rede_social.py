@@ -5,8 +5,8 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from langchain_groq import ChatGroq
 
-os.environ["GROQ_API_KEY"] = ""
-TELEGRAM_BOT_TOKEN = ""
+os.environ["GROQ_API_KEY"] = "GROQ_API_KEY"
+TELEGRAM_BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
 
 #CRIAR O MODELO DE IA Llama 3
 chat = ChatGroq(
