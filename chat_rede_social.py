@@ -1,12 +1,15 @@
 #Chat com Telegram Bot API
 import os
+import threading
+import streamlit as st
 from langchain_groq import ChatGroq
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from langchain_groq import ChatGroq
 
-os.environ["GROQ_API_KEY"] = "GROQ_API_KEY"
-TELEGRAM_BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
+#VARIAVEIS DE AMBIENTE
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 #CRIAR O MODELO DE IA Llama 3
 chat = ChatGroq(
@@ -29,7 +32,7 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     resposta = conversar_com_chatbot(pergunta)
     await update.message.reply_text(resposta)
 
-def main() -> None: 
+def iniciar_bot() -> None: 
     # Criar a aplicação do bot
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
@@ -37,10 +40,18 @@ def main() -> None:
     app.add_handler(CommandHandler("start", handle_message))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, process_message))
 
-    app.run_polling()
-
     # Iniciar o bot
     app.run_polling()
     
-if __name__ == "__main__":
-    main()
+def iniciar_streamlit():
+    st.set_page_config(page_title="Bot Online", layout="centered")
+    st.title("Telegram Bot Online")
+    st.success("O bot está rodando via polling!")
+    st.markdown("Este Web Service existe apenas para manter o bot ativo no Render Free. Fale com o bot pelo Telegram.")
+
+# Iniciar o bot em uma thread separada
+if "bot_thread" not in st.session_state:
+    st.session_state.bot_iniciado = True
+    bot_thread = threading.Thread(target=iniciar_bot, daemon=True).start()
+
+    iniciar_streamlit()
